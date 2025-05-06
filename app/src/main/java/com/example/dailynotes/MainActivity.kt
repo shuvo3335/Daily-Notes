@@ -25,10 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: NotesAdapter
-
-    private val viewModel: NoteViewModel by viewModels {
-        NoteViewModelFactory((application as NotesApp).noteRepository)
-    }
+    private lateinit var viewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,28 +33,32 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRecyclerView()
+        // Initialize ViewModel
+        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))
+            .get(NoteViewModel::class.java)
+
+        // Initialize Adapter
+        adapter = NotesAdapter { note ->
+            viewModel.removeNote(note)
+        }
+
+        // Setup RecyclerView
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = adapter
+
+        // Observe LiveData
         observeNotes()
 
         binding.btnAddNote.setOnClickListener {
             val noteText = binding.etNote.text.toString().trim()
             if (noteText.isNotEmpty()) {
-                val note = Notes(title = noteText, description = "")
+                val note = Notes(title = "Notes Title", description = noteText)
                 viewModel.addNote(note)
                 binding.etNote.text.clear()
             } else {
                 Toast.makeText(this, "Enter a note", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun setupRecyclerView() {
-        adapter = NotesAdapter { note ->
-            viewModel.removeNote(note)
-        }
-
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
     }
 
     private fun observeNotes() {
