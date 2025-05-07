@@ -11,6 +11,7 @@ import com.example.dailynotes.Model.Notes
 
 @Dao
 interface Note_DAO {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertNotes(notes: Notes)
 

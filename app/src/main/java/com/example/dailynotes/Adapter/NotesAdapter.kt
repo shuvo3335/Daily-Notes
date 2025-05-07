@@ -15,7 +15,7 @@ class NotesAdapter(
     class NoteViewHolder(private val binding: ItemNoteBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(note: Notes, onDeleteClick: (Notes) -> Unit) {
-            binding.tvNote.text = note.title
+            binding.tvNote.text = note.description
             binding.btnDelete.setOnClickListener {
                 onDeleteClick(note)
             }

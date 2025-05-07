@@ -34,8 +34,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Initialize ViewModel
-        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))
-            .get(NoteViewModel::class.java)
+
+        val dao = Note_Database.getDatabase(this).getNoteDao()
+        val repository = NoteRepository(dao)
+        val factory = NoteViewModelFactory(repository)
+
+        viewModel = ViewModelProvider(this,factory)
+                    .get(NoteViewModel::class.java)
 
         // Initialize Adapter
         adapter = NotesAdapter { note ->
